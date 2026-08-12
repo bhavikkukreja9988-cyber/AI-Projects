@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+  <h1>Media Ingest</h1>
+  <p class="sub">Download a selected section to your PC, import it into Premiere, and place it in empty timeline space at the playhead.</p>
+
+  <label>Video URL</label>
+  <input id="url" type="text" placeholder="https://www.youtube.com/...">
+
+  <div class="row">
+    <div><label>From</label><input id="start" value="00:00:00"></div>
+    <div><label>To</label><input id="end" value="00:00:10"></div>
+  </div>
+
+  <div class="row">
+    <div><label>Video track</label><input id="vtrack" type="number" min="1" value="1"></div>
+    <div><label>Audio track</label><input id="atrack" type="number" min="1" value="1"></div>
+  </div>
+
+  <label class="check"><input id="emptyOnly" type="checkbox" checked> Only use empty space after playhead</label>
+  <label class="check"><input id="includeAudio" type="checkbox" checked> Include audio</label>
+
+  <label>Save videos to</label>
+  <input id="folder" type="text" readonly>
+  <button id="openFolder" class="secondary">Open Videos Folder</button>
+
+  <details>
+    <summary>Resolver connection</summary>
+    <label>Resolver URL</label>
+    <input id="endpoint" type="url" placeholder="https://your-resolver.example.com/">
+    <label>API key</label>
+    <input id="apiKey" type="password" placeholder="Optional if your resolver requires it">
+    <button id="test" class="secondary">Test connection</button>
+  </details>
+
+  <button id="add" class="primary">Download & Add at Playhead</button>
+  <div id="status" class="status">Ready.</div>
+  <p class="note">Videos are kept locally in the folder above. The plugin does not install yt-dlp, FFmpeg, Python, or another downloader on your PC.</p>
+</main>
+<script src="index.js"></script>
+</body>
+</html>
