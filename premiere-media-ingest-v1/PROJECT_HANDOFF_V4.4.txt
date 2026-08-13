@@ -3,8 +3,8 @@ MEDIA INGEST — PROJECT HANDOFF
 Current state:
 - Premiere Pro: 26.2.2
 - Architecture: CEP/ZXP, not UXP/CCX
-- Known-good baseline: V4.3.2
-- Current feature build: V4.4.0 (not yet fully user-validated)
+- Known-good user-confirmed baseline: V4.3.2
+- Latest supplied feature build: V4.5.0 (not yet fully user-validated)
 - Working diagnostic confirmed CEP panel, Node.js, Premiere bridge, yt-dlp detection, FFmpeg detection, and child_process.
 
 Original goal:
@@ -33,13 +33,32 @@ Important behavior:
 - Deleting a Premiere project must NOT delete Media Ingest videos or URL index.
 - Uninstalling Media Ingest must NOT delete user videos, projects, yt-dlp, FFmpeg, or unrelated plugins.
 
-V4.4.0 planned/implemented features:
+V4.4 implemented:
 1. Automatic track selection / Auto mode
 2. Remember last settings
 3. Duplicate URL/download detection via a local Media Ingest index
 
-Roadmap after V4.4:
-V4.5: quality selector, stronger codec handling, progress, cancel
+V4.5.0 supplied build:
+1. Quality selector: Best available, 2160p, 1440p, 1080p
+2. Prefer H.264 checkbox, default ON
+3. Prefer smaller file checkbox, default OFF
+4. Graceful format fallback when an exact height/codec combination is unavailable
+5. Broader codec handling: non-H.264 video -> H.264; non-AAC/MP3 audio -> AAC
+6. H.264 + AAC/MP3 sources pass through without conversion
+7. Download progress detail: percentage, size, speed, ETA
+8. Cancel button for yt-dlp and FFmpeg
+9. Existing preferences preserved; V4.5 controls remembered after change
+
+V4.5 test checklist:
+- Verify resulting resolution for each quality setting.
+- Test VP9/non-AAC sources and confirm conversion.
+- Test H.264 + Opus and confirm only audio needs re-encoding.
+- Test detailed progress (percentage/size/speed/ETA).
+- Cancel during download and conversion.
+- Confirm no orphaned yt-dlp.exe or ffmpeg.exe processes remain.
+- Confirm panel returns to Ready after cancellation.
+
+Roadmap:
 V4.6: smarter track selection, markers, ripple options, sequence matching
 V4.7: multiple URLs, multiple clips from one source, queue
 V4.8: better Instagram/Facebook/Shorts support, URL cleanup
@@ -54,4 +73,5 @@ Testing history:
 - CEP diagnostic V4.2.3 successfully loaded.
 - V4.3.1 downloaded videos but Premiere rejected AV1 output.
 - V4.3.2 fixed AV1 handling; user reported that everything was working great.
-- V4.4.0 is the current feature build; keep V4.3.2 as fallback until V4.4 is confirmed.
+- V4.4.0 introduced auto tracks/settings persistence/duplicate detection.
+- V4.5.0 is the latest supplied feature build; keep V4.3.2 as fallback until V4.5 testing is confirmed.
