@@ -1,0 +1,57 @@
+V5.4.6
+
+Root cause found and fixed for the Stack-insertion failure that
+persisted through V5.4.5's attempted fix ("No free track space
+available at position 0.00s" / "...at or after 0.00s").
+
+The V5.4.5 fix added a fallback search when the exact playhead has no
+free track, but the FIRST search (checking the exact playhead before
+falling back) had two real bugs that could make it wrongly report
+"nothing free" even when free tracks genuinely existed:
+
+1. If your saved/selected Video or Audio Track preference pointed to
+   a track index that doesn't exist in the CURRENT sequence (e.g. you
+   had V3 selected from a previous project, now working in a sequence
+   with only 2 video tracks), the track scan started above the actual
+   track count and exited immediately without checking anything --
+   silently treating a totally free V1/V2 as "occupied."
+
+2. The scan only checked tracks at or above your preferred index,
+   never below it. If your preferred track was occupied but a lower
+   track was free at the exact same playhead position, it would skip
+   past that free track and fall through to searching for a LATER
+   position in time instead -- unnecessary and not what "Stack at
+   Playhead" is supposed to do.
+
+Fixed: the track scan now tries your preferred track first (if it's
+valid for the current sequence), then checks every other track from
+V1/A1 upward. Free space at the exact playhead is now always found if
+it exists, on whatever track it's on.
+
+Also added: if the "no free track space" error is ever hit again for
+a genuinely different reason, the message now reports the actual
+video/audio track count and stream mode, e.g.:
+
+  "No free track space available at or after 0.00s. (sequence has 1
+  video track(s), 1 audio track(s), stream mode: both). Add a track
+  in Premiere and try again."
+
+instead of just "No free track space available at 0.00s." -- so if
+it recurs, the next report will say exactly why instead of needing
+another round of guessing.
+
+No other files touched. No settings reset -- this only changes the
+internal track-search algorithm, not what's saved or how it's stored.
+
+WHAT TO TEST:
+1. The exact scenario that failed before: Stack mode, playhead at the
+   very start of the timeline (0:00), with existing clips already on
+   some tracks. Confirm the new clip lands on the first genuinely free
+   track instead of erroring.
+2. If you have a saved Video/Audio Track preference set to something
+   other than "Auto," try it in a sequence with fewer tracks than
+   that preference (e.g. preference = V3, sequence only has V1/V2)
+   and confirm it still finds free space instead of failing.
+3. If it fails again for any reason, the new error message will
+   report actual track counts -- please paste that exact message,
+   it'll make the next fix much faster.
