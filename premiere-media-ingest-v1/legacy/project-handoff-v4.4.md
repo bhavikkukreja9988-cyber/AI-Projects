@@ -4,7 +4,7 @@ Current state:
 - Premiere Pro: 26.2.2
 - Architecture: CEP/ZXP, not UXP/CCX
 - Known-good user-confirmed baseline: V4.3.2
-- Latest supplied feature build: V4.5.0 (not yet fully user-validated)
+- Latest supplied feature build documented at the time: V4.5.0 (not yet fully user-validated)
 - Working diagnostic confirmed CEP panel, Node.js, Premiere bridge, yt-dlp detection, FFmpeg detection, and child_process.
 
 Original goal:
@@ -14,10 +14,6 @@ Local tools:
 - yt-dlp.exe installed separately by user
 - ffmpeg.exe installed separately by user
 - ffprobe is optional
-
-Detected example paths on user's machine:
-C:\Users\bhavi\AppData\Local\Microsoft\WinGet\Links\yt-dlp.exe
-C:\Users\bhavi\AppData\Local\Microsoft\WinGet\Packages\yt-dlp.FFmpeg_...\bin\ffmpeg.exe
 
 Default download location:
 C:\Users\<WindowsUser>\Documents\Adobe\Premiere Pro\<PremiereMajorMinor>\Media Ingest\Videos
@@ -49,29 +45,13 @@ V4.5.0 supplied build:
 8. Cancel button for yt-dlp and FFmpeg
 9. Existing preferences preserved; V4.5 controls remembered after change
 
-V4.5 test checklist:
-- Verify resulting resolution for each quality setting.
-- Test VP9/non-AAC sources and confirm conversion.
-- Test H.264 + Opus and confirm only audio needs re-encoding.
-- Test detailed progress (percentage/size/speed/ETA).
-- Cancel during download and conversion.
-- Confirm no orphaned yt-dlp.exe or ffmpeg.exe processes remain.
-- Confirm panel returns to Ready after cancellation.
-
-Roadmap:
-V4.6: smarter track selection, markers, ripple options, sequence matching
-V4.7: multiple URLs, multiple clips from one source, queue
-V4.8: better Instagram/Facebook/Shorts support, URL cleanup
-V4.9: preview, visual range selector
-V5.0: keyboard shortcut, mini-panel, history, project-aware cleanup, paste+Enter mode
-
 Development rule:
-Keep CEP/ZXP because it is proven on the user's Premiere 26.2.2. Do not switch extension systems without a strong reason and explicit agreement.
+Keep CEP/ZXP because it was proven on the user's Premiere 26.2.2. Do not switch extension systems without a strong reason and explicit agreement.
 
 Testing history:
 - Earlier CCX/UXP packaging attempts failed to install through Creative Cloud.
 - CEP diagnostic V4.2.3 successfully loaded.
 - V4.3.1 downloaded videos but Premiere rejected AV1 output.
-- V4.3.2 fixed AV1 handling; user reported that everything was working great.
+- V4.3.2 fixed AV1 handling; the project notes record the user reporting that everything was working great.
 - V4.4.0 introduced auto tracks/settings persistence/duplicate detection.
-- V4.5.0 is the latest supplied feature build; keep V4.3.2 as fallback until V4.5 testing is confirmed.
+- V4.5.0 was the supplied feature build; V4.3.2 remained the fallback until V4.5 testing was confirmed.
