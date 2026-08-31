@@ -1,0 +1,212 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Media Ingest V5.4.5</title>
+<script>
+"use strict";
+window.require = typeof require === "function" ? function (require, document) {
+  var tmp = document.querySelector("script[data-main]");
+  if (tmp) require(tmp.dataset.main);
+  return require;
+}(require, document) : function (document) {
+  var C=/,[ ]*/gim, S=[/[/]+/gim];
+  function L(){var h=document.head,tmp=h.querySelector("script[data-scripts]"),ts=tmp?tmp.dataset.scripts:"",bs=h.querySelector("script[data-base_dir]"),b=bs&&typeof bs.dataset.base_dir==="string"?bs.dataset.base_dir:"./"; b=new URL(b,location.href).href; if(b){var bt=document.createElement("base");bt.setAttribute("href",b);h.append(bt);} if(typeof ts==="string"){ts.trim().replace(C,",").split(",").forEach(function(u){if(!u)return;var l=document.createElement("link");l.rel="stylesheet";l.href=u.trim();h.append(l);});} return b;}
+  return function(){var base=L(),mods={}; function req(f){ if (f==="fs"||f==="path"||f==="os"||f==="child_process"||f==="crypto") throw new Error("Node module loading is provided by the CEP runtime."); return mods[f]; } return req; }();
+}(document);
+</script>
+<style>
+:root{color-scheme:dark}body{font:13px Arial,sans-serif;background:#1e1e1e;color:#eee;padding:14px;margin:0}h2{margin:0 0 12px;font-size:18px}.box{background:#151515;border:1px solid #333;padding:11px;border-radius:6px;margin-bottom:10px}label{display:block;margin:7px 0 4px;color:#cfcfcf}input,select,textarea{width:100%;box-sizing:border-box;background:#242424;border:1px solid #444;color:#fff;padding:8px;border-radius:4px;font-family:inherit}.row{display:flex;gap:8px}.row>div{flex:1}.check{display:flex;align-items:center;gap:7px;margin-top:9px}.check input{width:auto}button{background:#3f7ddd;color:#fff;border:0;padding:9px 12px;border-radius:4px;cursor:pointer;font-weight:600}button:disabled{opacity:.5;cursor:default}.secondary{background:#333}.status{min-height:42px;white-space:pre-wrap;line-height:1.35;color:#bfc6d1}.good{color:#7de08c}.warn{color:#ffd166}.bad{color:#ff8c8c}.small{font-size:11px;color:#999}.progress{height:8px;background:#333;border-radius:4px;overflow:hidden;margin-top:8px}.progress>div{height:100%;width:0;background:#3f7ddd;transition:width .15s}.toolrow{display:flex;justify-content:space-between;gap:8px;padding:4px 0}.toolname{color:#aaa}.toolpath{word-break:break-all;text-align:right;max-width:70%}.hint{margin-top:6px;color:#8d95a3;font-size:11px;line-height:1.3}.reuseChoice{margin-top:10px;padding-top:10px;border-top:1px solid #333}.tabrow{display:flex;gap:4px;margin-bottom:8px}.tab{flex:1;padding:6px;background:#252525;border:1px solid #333;color:#aaa;text-align:center;border-radius:4px;cursor:pointer;font-weight:600;font-size:11px}.tab.active{background:#3f7ddd;color:#fff;border-color:#3f7ddd}.historyItem{background:#202020;border:1px solid #333;border-radius:4px;padding:8px;margin-bottom:6px}.historyTitle{font-weight:600;font-size:12px;margin-bottom:4px;word-break:break-all}.historyMeta{color:#888;font-size:11px;margin-bottom:6px}.previewTop{display:flex;gap:10px;align-items:center}.previewInfo{flex:1;min-width:0}.previewPlatform{display:inline-block;padding:2px 6px;border:1px solid #3b4d68;border-radius:999px;color:#9fb9df;background:#1c2635;font-size:9px;font-weight:700;margin-bottom:4px}.previewTitle{font-weight:700;font-size:12px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.previewMeta{font-size:10px;color:#aaa;margin-top:4px;line-height:1.35}.previewBadges{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}.previewBadge{font-size:9px;color:#c9d1dc;background:#242424;border:1px solid #3a3a3a;border-radius:999px;padding:3px 6px}
+ .appHeader{display:flex;justify-content:space-between;align-items:flex-start;margin:0 0 12px}.appHeader h2{margin:0;font-size:18px}.version{font-size:10px;color:#888;margin-top:2px}.headerHint{font-size:10px;color:#777;padding-top:4px;text-align:right}.sectionLabel{font-size:11px;font-weight:700;color:#bbb;margin:2px 0 6px;text-transform:uppercase;letter-spacing:.04em}.advancedBox{margin-top:10px;border-top:1px solid #333;padding-top:8px}.advancedBox summary{cursor:pointer;color:#aaa;font-weight:700;font-size:11px;user-select:none}.advancedContent{padding-top:8px}.toolFooter{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 10px;margin-top:4px;color:#999;border-top:1px solid #2f2f2f}.toolBadge{display:inline-flex;gap:7px;align-items:center;background:#151515;border:1px solid #303030;border-radius:999px;padding:5px 9px;font-size:11px}.toolStatus{font-weight:700}.footerMeta{display:flex;gap:12px;font-size:10px;color:#777;flex:1;justify-content:flex-end;flex-wrap:wrap}.toolStatus.good{color:#7de08c}.toolStatus.bad{color:#ff8c8c}</style>
+</head>
+<body>
+<div class="appHeader"><div><h2>Media Ingest</h2><div class="version">V5.4.4</div></div><div class="headerHint"><button id="quickToggle" class="secondary" style="padding:5px 9px;font-size:10px">Quick Import</button></div></div>
+
+<div id="quickPanel" class="box" style="display:none;position:relative;border-color:#3f7ddd">
+  <div class="sectionLabel">Quick Import</div>
+  <input id="quickUrl" type="text" placeholder="Paste URL or URL 02:34-03:15">
+  <div class="row" style="margin-top:7px"><div><label>From</label><input id="quickStart" value="00:00:00"></div><div><label>To</label><input id="quickEnd" value="00:00:15"></div></div>
+  <label class="check"><input id="quickUseTime" type="checkbox" checked> Use time range</label>
+  <label style="margin-top:8px">Import Mode</label>
+  <select id="quickImportMode"><option value="projectAndTimeline">Project + Timeline</option><option value="projectOnly">Project Panel Only</option></select>
+  <div class="row" style="margin-top:8px"><button id="quickPaste" class="secondary" style="flex:1">Paste &amp; Start</button><button id="quickRun" style="flex:1">Import</button></div>
+  <div class="hint">Quick mode uses the same download, codec, quality, and timeline engine as the main panel.</div>
+</div>
+
+<div class="box">
+  <div class="tabrow">
+    <div id="tabSingle" class="tab active">Single Clip</div>
+    <div id="tabBatch" class="tab">Batch / Multi-Clip</div>
+    <div id="tabHistory" class="tab">History &amp; Manager</div>
+  </div>
+
+  <div id="singleSection">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div style="display:flex;align-items:center;gap:6px"><label style="margin:0">Video URL</label><button id="pasteStart" class="secondary" style="padding:4px 8px;font-size:11px">Paste &amp; Start</button></div>
+      <button id="fetchInfo" class="secondary" style="padding:4px 8px;font-size:11px">Fetch Info</button>
+    </div>
+    <input id="url" type="text" placeholder="Paste URL (or: URL 02:34-03:15)" style="margin-top:4px">
+    <div id="urlBadge" class="small good" style="margin-top:4px;display:none"></div><div class="hint">Quick mode: paste a URL with an optional range, then press Enter. Example: https://youtu.be/xyz 02:34-03:15</div>
+
+    <div id="previewCard" class="box previewCard" style="display:none;margin-top:8px;padding:8px">
+      <div class="previewTop">
+        <img id="previewThumb" class="previewThumb" style="width:100px;height:56px;object-fit:cover;border-radius:4px;background:#111">
+        <div class="previewInfo">
+          <div id="previewPlatform" class="previewPlatform" style="display:none"></div>
+          <div id="previewTitle" class="previewTitle"></div>
+          <div id="previewMeta" class="previewMeta"></div>
+        </div>
+      </div>
+      <div id="previewBadges" class="previewBadges" style="display:none"></div>
+    </div>
+    
+    <div class="row" style="margin-top:8px">
+      <div><label>From</label><input id="start" value="00:00:00"></div>
+      <div><label>To</label><input id="end" value="00:00:15"></div>
+    </div>
+    <div id="rangeDuration" class="small good" style="margin-top:4px">Clip Duration: 15.00s</div>
+    <label class="check"><input id="useTimeRange" type="checkbox" checked> Use time range</label>
+    <label style="margin-top:8px">Import Mode</label>
+    <select id="importMode"><option value="projectAndTimeline">Project + Timeline</option><option value="projectOnly">Project Panel Only</option></select>
+  </div>
+
+  <div id="batchSection" style="display:none">
+    <label>Batch Downloads</label>
+    <textarea id="batchText" rows="6" placeholder="Paste one URL per line:&#10;https://youtube.com/video1&#10;https://youtube.com/video2&#10;https://instagram.com/...&#10;https://facebook.com/...&#10;&#10;Optional: URL 00:10 00:30"></textarea>
+    <div class="hint">Batch mode downloads each unique source video only ONCE and imports the downloaded videos into the Premiere Project panel. Nothing is inserted into the timeline.</div>
+  </div>
+
+  <div id="historySection" style="display:none">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:6px">
+      <div id="storageSummary" class="small good" style="flex:1">Media Storage: calculating…</div>
+      <button id="cleanMissingBtn" class="secondary" style="padding:4px 8px;font-size:11px">Clean Missing</button>
+      <button id="refreshHistoryBtn" class="secondary" style="padding:4px 8px;font-size:11px">Refresh</button>
+    </div>
+    <input id="historySearch" type="text" placeholder="Search downloaded media…" style="margin-bottom:8px">
+    <div class="row" style="gap:4px;margin-bottom:8px">
+      <select id="historyPlatform"><option value="all">All platforms</option><option value="YouTube">YouTube</option><option value="Instagram">Instagram</option><option value="Facebook">Facebook</option></select>
+      <select id="historyQuality"><option value="all">All qualities</option><option value="4k+">4K+</option><option value="1440p">1440p</option><option value="1080p">1080p</option><option value="720p">720p</option><option value="480p-or-lower">480p or lower</option></select>
+      <select id="historyCodec"><option value="all">All video codecs</option><option value="h264">H.264</option><option value="av1">AV1</option><option value="vp9">VP9</option><option value="vp8">VP8</option></select>
+    </div>
+    <div class="row" style="gap:4px;margin-bottom:8px">
+      <button id="historyRecent" class="secondary" style="padding:6px 9px;font-size:11px">Recently Used</button>
+      <button id="historyMostUsed" class="secondary" style="padding:6px 9px;font-size:11px">Most Used</button>
+    </div>
+    <div class="row" style="gap:4px;margin-bottom:8px">
+      <select id="historySort" style="flex:1"><option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="name">Name A–Z</option><option value="size">Largest first</option></select>
+      <button id="historyFavoritesOnly" class="secondary" style="padding:6px 9px;font-size:11px">★ Favorites</button>
+      <button id="historyClearSearch" class="secondary" style="padding:6px 9px;font-size:11px">Clear</button>
+    </div>
+    <div id="historyList" style="max-height:220px;overflow-y:auto"></div>
+  </div>
+
+  <div id="controlsPanel">
+    <div class="sectionLabel">Download Quality</div>
+    <select id="quality">
+      <option value="best" selected>Best Available</option>
+      <option value="2160">2160p (4K)</option>
+      <option value="1440">1440p</option>
+      <option value="1080">1080p</option>
+      <option value="720">720p</option>
+      <option value="480">480p</option>
+    </select>
+    <div class="hint">Selects up to the chosen resolution. If that quality is unavailable, the closest available stream is used.</div>
+
+    <details id="advancedSettings" class="advancedBox">
+      <summary>Advanced Settings</summary>
+      <div class="advancedContent">
+        <div class="row">
+          <div>
+            <label>Stream Mode</label>
+            <select id="streamMode">
+              <option value="both" selected>Video + Audio</option>
+              <option value="videoOnly">Video Only</option>
+              <option value="audioOnly">Audio Only (Fast)</option>
+            </select>
+          </div>
+          <div>
+            <label>Insertion Mode</label>
+            <select id="insertMode">
+              <option value="stack" selected>Stack at Playhead (Safe)</option>
+              <option value="ripple">Ripple Insert at Playhead</option>
+              <option value="overwrite">Overwrite at Playhead</option>
+              <option value="gap">Find Next Empty Gap</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label>Video Track</label>
+            <select id="vtrack">
+              <option value="auto">Auto</option>
+              <option value="0">V1</option>
+              <option value="1">V2</option>
+              <option value="2">V3</option>
+            </select>
+          </div>
+          <div>
+            <label>Audio Track</label>
+            <select id="atrack">
+              <option value="auto">Auto</option>
+              <option value="0">A1</option>
+              <option value="1">A2</option>
+              <option value="2">A3</option>
+            </select>
+          </div>
+        </div>
+
+        <label class="check"><input id="scaleToFrame" type="checkbox" checked> Scale clip to sequence frame size</label>
+        <label class="check"><input id="snapToMarker" type="checkbox"> Snap start position to nearest sequence marker</label>
+        <label class="check"><input id="reuseExisting" type="checkbox" checked> Reuse existing download when available</label>
+        <label class="check"><input id="preferH264" type="checkbox" checked> Prefer H.264 when possible</label>
+        <label class="check"><input id="preferSmaller" type="checkbox"> Prefer smaller file size</label>
+        <div id="modeHint" class="hint"></div>
+      </div>
+    </details>
+  </div>
+
+</div>
+
+<div class="box">
+  <div class="row">
+    <button id="add">Download &amp; Add Selection(s)</button>
+    <button id="test" class="secondary">Test Tools</button>
+  </div>
+  <div class="progress"><div id="progressBar"></div></div>
+  <div id="progressDetail" class="small" style="margin-top:4px"></div>
+  <div class="row" style="margin-top:8px"><button id="cancel" class="secondary" style="display:none">Cancel</button></div>
+  <div id="status" class="status" style="margin-top:8px">Ready.</div>
+  <div id="resultCard" class="box" style="display:none;margin-top:8px;padding:9px;background:#171717">
+    <div style="font-size:11px;font-weight:700;color:#bbb;margin-bottom:6px">Last Result</div>
+    <div id="resultTitle" style="font-weight:700;color:#fff;margin-bottom:4px"></div>
+    <div id="resultMeta" class="small" style="line-height:1.45"></div>
+    <div id="resultPath" class="small" style="margin-top:5px;word-break:break-all"></div>
+  </div>
+
+  <div id="reuseChoice" class="reuseChoice" style="display:none">
+    <div id="reuseChoiceText" class="small" style="margin-bottom:8px"></div>
+    <div class="row">
+      <button id="reuseUseExisting">Use Existing</button>
+      <button id="reuseDownloadAgain" class="secondary">Download Again</button>
+    </div>
+  </div>
+</div>
+
+<div class="box">
+  <div class="row">
+    <button id="openFolder" class="secondary">Open Videos Folder</button>
+    <button id="rescan" class="secondary">Rescan Tools</button>
+  </div>
+  <div id="folder" class="small" style="margin-top:8px;word-break:break-all">Folder: detecting…</div>
+</div>
+
+<div class="toolFooter" id="toolsEnvironmentBox">
+  <div class="toolBadge"><span>yt-dlp</span><span id="ytpath" class="toolStatus">Checking…</span></div>
+  <div class="toolBadge"><span>FFmpeg</span><span id="ffpath" class="toolStatus">Checking…</span></div>
+  <div class="footerMeta"><span id="premiereVersion">Premiere detecting…</span><span id="seqResolution">Sequence: detecting…</span></div>
+</div>
+
+<script src="./app.js"></script>
+</body>
+</html>
