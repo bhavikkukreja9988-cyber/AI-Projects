@@ -1,35 +1,29 @@
-# Media Ingest 1.1.0
+# Premiere Media Ingest
 
-Premiere Pro UXP panel that accepts a public YouTube, Instagram, or Facebook URL, requests a selected time range from the cloud resolver, downloads the resulting MP4 directly to the user's PC, imports it into the active Premiere project, and places it at the playhead or the first later continuous empty gap large enough for the clip.
+A Premiere Pro extension for importing supported video URLs and placing selected ranges on the timeline.
 
-## Local video location
+## Version status
 
-On Windows the default folder is calculated automatically from the current Windows user and Premiere host version:
+- **Latest:** V6.0.0
+- **Known-good baseline:** V4.3.2
+- **Previous important release:** V5.4.6
 
-`C:\Users\<username>\Documents\Adobe\Premiere Pro\<major.minor>\Media Ingest\Videos`
+See [`docs/VERSION_STATUS.md`](docs/VERSION_STATUS.md) for the release policy.
 
-For a Premiere 26.0 installation this is normally:
+## Repository layout
 
-`C:\Users\<username>\Documents\Adobe\Premiere Pro\26.0\Media Ingest\Videos`
+```text
+premiere-media-ingest-v1/
+├── backend/                  # backend/resolver project files
+├── plugin/                   # older plugin copy; remove after final V6 verification
+├── releases/                 # versioned releases and installers
+│   ├── baseline/v4.3.2/      # established fallback reference
+│   ├── v5.4.5/               # historical release
+│   ├── v5.4.6/               # previous stable feature build
+│   └── v6.0.0/               # latest release
+└── docs/                     # project/version documentation
+```
 
-The folder can be changed later if needed.
+## Cleanup policy
 
-## Client requirements
-
-- Premiere Pro 25.6+ / 26.x
-- No yt-dlp, FFmpeg, Python, or command-line software installed on the user's computer
-- Install/uninstall as a UXP `.ccx` through Creative Cloud Desktop
-
-## Cloud backend
-
-The backend runs server-side and may use yt-dlp + FFmpeg there. It returns a short-lived signed download URL. The final MP4 is saved locally on the user's PC and remains there after the project is closed.
-
-## Deployment
-
-1. Deploy `backend/` to a container host.
-2. Configure environment variables from `backend/.env.example`.
-3. Set `MEDIA_INGEST_API_KEY` to a strong secret.
-4. Configure S3/R2-compatible storage credentials and endpoint.
-5. Point the plugin's Resolver URL at the deployed backend.
-
-Never commit real API keys or cloud credentials.
+Only the latest release, the known-good baseline, and useful regression/debugging predecessors should remain prominent. Intermediate development copies should not be treated as active source trees.
