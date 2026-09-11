@@ -1,0 +1,39 @@
+<ExtensionManifest Version="7.0" ExtensionBundleId="com.bhavik.mediaingest" ExtensionBundleVersion="5.4.6" Version="5.4.6">
+  <ExtensionList>
+    <Extension Id="com.bhavik.mediaingest" Version="5.4.6" />
+  </ExtensionList>
+  <ExecutionEnvironment>
+    <HostList>
+      <Host Name="PPRO" Version="26.0" />
+    </HostList>
+    <LocaleList>
+      <Locale Code="All" />
+    </LocaleList>
+    <RequiredRuntimeList>
+      <RequiredRuntime Name="CSXS" Version="11.0" />
+    </RequiredRuntimeList>
+  </ExecutionEnvironment>
+  <DispatchInfoList>
+    <Extension Id="com.bhavik.mediaingest">
+      <DispatchInfo>
+        <Resources>
+          <MainPath>./main/index.html</MainPath>
+          <ScriptPath>./jsx/index.js</ScriptPath>
+        </Resources>
+        <Lifecycle>
+          <AutoVisible>true</AutoVisible>
+        </Lifecycle>
+        <UI>
+          <Type>Panel</Type>
+          <Menu>Media Ingest</Menu>
+          <Geometry>
+            <Size>
+              <Height>760</Height>
+              <Width>420</Width>
+            </Size>
+          </Geometry>
+        </UI>
+      </DispatchInfo>
+    </Extension>
+  </DispatchInfoList>
+</ExtensionManifest>
