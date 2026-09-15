@@ -14,6 +14,7 @@
 
 - CEP manifest and panel version updated to 6.1.0.
 - Panel height increased to accommodate the Find It workflow.
+- Added `dist/MediaIngest-V6.1.0.zxp` as an unsigned development package; the complete editable source remains under `source/`.
 
 ## Not changed
 

@@ -24,4 +24,4 @@ The keys are stored only in the CEP panel's localStorage on that computer. They 
 
 ## Packaging and installation
 
-`source/` is the complete CEP extension source. The manifest has been bumped to 6.1.0. A signed ZXP is intentionally not included: Adobe ZXP packaging requires the publisher's signing certificate/private key, which is not present in the supplied V6.0.1 release. Package `source/` with the same signing process used for V6.0.1, or install it as an unpacked CEP extension in a development-enabled Premiere environment.
+`source/` is the complete CEP extension source. `dist/MediaIngest-V6.1.0.zxp` is an unsigned ZIP-compatible development package containing the same source contents. A production-installable ZXP still requires the publisher's signing certificate/private key, which is not present in the supplied V6.0.1 release. For development, enable CEP unsigned-extension mode or sign the package with the existing V6.0.1 signing process.
