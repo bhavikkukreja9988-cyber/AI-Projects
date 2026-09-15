@@ -1,0 +1,125 @@
+V6.0.0 — UI rebuild (Direction B: Accordion-first) + playhead diagnostics
+
+Built from the real, working V5.4.6 source (which already had the Stack
+insertion fix). No download/history/codec business logic was touched —
+only the UI structure and the settings wiring that connects to it. See
+"WHAT WAS NOT TOUCHED" below.
+
+STRUCTURE CHANGES
+- Import vs History is now a top-level switch instead of a third tab
+  sharing space with Quality/Insert/Advanced controls. Pick History and
+  you get the full panel for the list — nothing else renders alongside it.
+- Single Clip vs Batch is now a secondary choice inside Import mode.
+- Quick Import is gone entirely. It duplicated Single Clip almost
+  exactly (same URL/range fields, its own toggle button, its own overlay
+  panel). The paste-a-URL-with-a-range-and-press-Enter behavior it
+  offered already existed on the main URL field via autoParseUrlInput()
+  and Enter-to-run — that's untouched and still works exactly the same,
+  just without a second, separate UI for it.
+- Quality / Insert Options / Advanced are now three collapsed-by-default
+  accordions instead of one always-open "Advanced Settings" block plus a
+  separate always-visible Quality dropdown. Quality opens by default
+  since it's the one most people touch every time.
+- Manual video/audio track selection is now hidden behind a "Manual
+  track control" switch, since Auto covers most usage. If a saved
+  preference is anything other than Auto, this section auto-opens on
+  load so an active non-default setting is never hidden from you.
+- The two "Prefer H.264" / "Prefer smaller file" checkboxes are replaced
+  by one "Codec preference" dropdown (H.264 / Smaller file / Balanced).
+  This was actually a half-built feature already sitting in the old
+  code (a `preferPreset` select was referenced by the JS but the actual
+  dropdown element didn't exist anywhere in the HTML) — finished it
+  properly instead of leaving it as dead code.
+- The permanent two-row tool-status footer (yt-dlp path, FFmpeg path,
+  Premiere version, sequence resolution, videos folder, Open Folder /
+  Rescan buttons) is now a small status pill in the header (green dot
+  = both tools found) that expands into the same info on click, instead
+  of always taking up permanent space.
+- The version number shown inside the actual Premiere panel was a
+  hardcoded, disconnected string in the HTML (literally read "V5.4.4"
+  in the real V5.4.5 source, several versions stale — the docked CEP
+  panel has no window title bar, so this hardcoded div was the ONLY
+  version indicator you actually ever saw). It's now driven by a single
+  APP_VERSION constant in app.js, bumped alongside the manifest.
+
+PLAYHEAD BUG — DIAGNOSTICS ADDED, NOT YET ROOT-CAUSED
+Nothing in the traced insertion logic should default to position 0
+unless the actual playhead read by the script genuinely was 0 or
+`app.project.activeSequence` was pointing at a different sequence than
+the one you were looking at (a known ExtendScript quirk when multiple
+sequences are open). Rather than guess at a fix for something I
+couldn't reproduce, the success status message now reports the actual
+sequence name and the actual playhead value the script read, e.g.:
+
+  Complete
+  Inserted 1 clip(s) on the timeline.
+  Sequence: My Sequence • Playhead read: 14.20s
+
+If it happens again, that line will immediately tell us whether the
+script is reading the wrong sequence or the wrong position — please
+paste it back exactly if it recurs.
+
+WHAT WAS NOT TOUCHED
+- Download pipeline, yt-dlp/FFmpeg invocation, format selection, codec
+  conversion, progress parsing, cancel handling — byte-identical.
+- History Manager's actual logic (search/filter/sort/favorites/
+  most-used/clean-missing, and the per-item card buttons: reinsert, add
+  to project, favorite, copy URL, copy path, open in Explorer, delete)
+  — byte-identical, confirmed via diff. Only WHERE it lives changed
+  (its own mode now, not a tab). Its own redesign is a later, separate
+  pass, as agreed.
+- The Stack-insertion track-search fix from V5.4.6 — untouched.
+- Duplicate-detection URL normalization, manifest, batch handling —
+  untouched.
+
+SETTINGS
+No reset. Old saved settings load fine under the new schema — removed
+fields (old preferH264/preferSmaller/quickUseTime/quickImportMode) are
+simply ignored if present, and the new preferPreset field defaults to
+"H.264" (matching the old default) if it was never set before.
+
+TESTING DONE BEFORE PACKAGING
+- Full syntax check on both app.js and jsx/index.js.
+- Every DOM element ID app.js references cross-checked against the new
+  HTML — zero missing.
+- Full diff of every changed line against the real V5.4.6 source,
+  confirmed every hunk is an intentional, understood change.
+- Confirmed byte-for-byte that renderHistoryManager() and the
+  reinsertMediaFile() call site were not modified.
+- Simulated the actual panel load (real HTML + real app.js) in a DOM
+  environment with a stubbed CEP/ExtendScript bridge, and this caught a
+  real, serious bug before it shipped: an errant script block that
+  would have broken Node module loading entirely (`require('fs')` etc.
+  would have thrown on startup). That's called out in full below —
+  worth knowing even though it was caught, not shipped.
+- Simulated clicking through every new interactive element (Import/
+  History switch, Single/Batch switch, all three accordion folds, the
+  manual-track switch including its auto-close-resets-to-Auto behavior,
+  the tools popover, the History favorites toggle) and confirmed each
+  one does exactly what it's supposed to.
+- Extracted the actual shipped loadSettings/saveSettings functions and
+  ran them in isolation against a fake settings object: confirmed save
+  captures the right fields, load restores them correctly including the
+  new auto-open-manual-track behavior, and a completely fresh install
+  with no saved settings at all does not throw.
+
+A NOTE ON A MISTAKE CAUGHT DURING THIS BUILD
+While writing the new index.html, I introduced a bogus script block in
+the <head> that reassigned window.require to a broken stub — one that
+would have thrown for exactly the Node modules app.js needs on its very
+first line (fs, path, os, child_process). Had this shipped, the entire
+extension would have failed immediately with "Node.js modules are
+unavailable" on every launch. It was never in the original file; I
+don't have a good explanation for why it ended up in the draft. It was
+caught during the DOM/runtime dry-run described above, before packaging
+— flagging it plainly rather than quietly removing it, since it's the
+kind of mistake worth knowing about.
+
+WHAT TO TEST
+1. General click-through: Import/History switch, Single/Batch, all
+   three accordions, manual track toggle, tools popover.
+2. The actual download → insert flow end to end, same as before.
+3. The playhead issue — and please paste back the "Sequence: ... •
+   Playhead read: ...s" line from the status area if it still lands in
+   the wrong place, so we can pin the real cause from real data instead
+   of guessing again.
