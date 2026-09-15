@@ -1,0 +1,342 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Media Ingest V6.1.0</title>
+<style>
+:root{color-scheme:dark}body{font:13px Arial,sans-serif;background:#1e1e1e;color:#eee;padding:14px;margin:0}
+h2{margin:0;font-size:16px}
+.box{background:#151515;border:1px solid #333;padding:11px;border-radius:6px;margin-bottom:10px}
+label{display:block;margin:7px 0 4px;color:#cfcfcf}
+input,select,textarea{width:100%;box-sizing:border-box;background:#242424;border:1px solid #444;color:#fff;padding:8px;border-radius:4px;font-family:inherit}
+.row{display:flex;gap:8px}
+.row>div{flex:1}
+.check{display:flex;align-items:center;gap:7px;margin-top:9px}
+.check input{width:auto}
+button{background:#3f7ddd;color:#fff;border:0;padding:9px 12px;border-radius:4px;cursor:pointer;font-weight:600}
+button:disabled{opacity:.5;cursor:default}
+.secondary{background:#333}
+.secondary.active{background:#3f7ddd;color:#fff}
+.status{min-height:42px;white-space:pre-wrap;line-height:1.35;color:#bfc6d1}
+.good{color:#7de08c}.warn{color:#ffd166}.bad{color:#ff8c8c}
+.small{font-size:11px;color:#999}
+.progress{height:8px;background:#333;border-radius:4px;overflow:hidden;margin-top:8px}
+.progress>div{height:100%;width:0;background:#3f7ddd;transition:width .15s}
+.hint{margin-top:6px;color:#8d95a3;font-size:11px;line-height:1.3}
+.reuseChoice{margin-top:10px;padding-top:10px;border-top:1px solid #333}
+.historyItem{background:#202020;border:1px solid #333;border-radius:4px;padding:8px;margin-bottom:6px}
+.historyTitle{font-weight:600;font-size:12px;margin-bottom:4px;word-break:break-all}
+.historyMeta{color:#888;font-size:11px;margin-bottom:6px}
+.previewTop{display:flex;gap:10px;align-items:center}
+.previewInfo{flex:1;min-width:0}
+.previewPlatform{display:inline-block;padding:2px 6px;border:1px solid #3b4d68;border-radius:999px;color:#9fb9df;background:#1c2635;font-size:9px;font-weight:700;margin-bottom:4px}
+.previewTitle{font-weight:700;font-size:12px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.previewMeta{font-size:10px;color:#aaa;margin-top:4px;line-height:1.35}
+.previewBadges{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+.previewBadge{font-size:9px;color:#c9d1dc;background:#242424;border:1px solid #3a3a3a;border-radius:999px;padding:3px 6px}
+.appHeader{display:flex;justify-content:space-between;align-items:center;margin:0 0 12px}
+.version{font-size:10px;color:#888;margin-top:1px}
+.statusPill{display:flex;align-items:center;gap:6px;background:#151515;border:1px solid #333;border-radius:999px;padding:5px 10px;font-size:10px;color:#999;cursor:pointer;user-select:none}
+.statusPill .dot{width:6px;height:6px;border-radius:50%;background:#666}
+.statusPill .dot.good{background:#7de08c}
+.statusPill .dot.bad{background:#ff8c8c}
+.toolsPopover{display:none;margin-bottom:10px}
+.toolsPopover.open{display:block}
+.toolrow{display:flex;justify-content:space-between;gap:8px;padding:4px 0}
+.toolname{color:#aaa}
+.toolpath{word-break:break-all;text-align:right;max-width:70%}
+.segCtl{display:flex;background:#151515;border:1px solid #333;border-radius:6px;padding:2px;margin-bottom:10px}
+.segBtn{flex:1;text-align:center;padding:7px;font-size:12px;font-weight:700;color:#999;border-radius:4px;cursor:pointer}
+.segBtn.active{background:#3f7ddd;color:#fff}
+.subTabRow{display:flex;gap:6px;margin-bottom:10px}
+.subTab{flex:1;text-align:center;padding:6px;font-size:11px;font-weight:600;color:#999;background:#1c1c1c;border:1px solid #333;border-radius:5px;cursor:pointer}
+.subTab.active{background:#2a3a52;color:#9fb9df;border-color:#3b4d68}
+.foldRow{display:flex;justify-content:space-between;align-items:center;cursor:pointer;padding:2px 0;user-select:none}
+.foldRow .lbl{font-size:11px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.03em}
+.foldRow .chev{color:#777;font-size:13px;transition:transform .15s;display:inline-block}
+.foldRow.open .chev{transform:rotate(90deg)}
+.foldBody{display:none;padding-top:9px}
+.foldBody.open{display:block}
+.toggleRow{display:flex;justify-content:space-between;align-items:center;margin-top:6px}
+.toggleRow span{font-size:12px;color:#cfcfcf}
+.swtch{width:32px;height:18px;background:#333;border-radius:99px;position:relative;cursor:pointer;flex-shrink:0}
+.swtch.on{background:#3f7ddd}
+.swtch .knob{position:absolute;top:2px;left:2px;width:14px;height:14px;background:#fff;border-radius:50%;transition:left .15s}
+.swtch.on .knob{left:16px}
+.trackFields{display:none;margin-top:8px}
+.trackFields.open{display:block}
+.findStep{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#9fb9df;margin:2px 0 7px}
+.findCandidate{display:flex;gap:8px;align-items:flex-start;background:#202020;border:1px solid #333;border-radius:5px;padding:8px;margin-top:7px}
+.findCandidate.selected{border-color:#3f7ddd;background:#1c293b}
+.findCandidate img{width:96px;height:54px;object-fit:cover;border-radius:3px;background:#111}
+.findCandidateInfo{flex:1;min-width:0}.findCandidateTitle{font-weight:700;font-size:12px;line-height:1.3}.findCandidateMeta{font-size:10px;color:#aaa;margin-top:4px;line-height:1.35}
+.findNotice{padding:8px;border:1px solid #3b4d68;background:#1c2635;color:#c9d9ef;border-radius:4px;font-size:11px;line-height:1.4;margin-top:8px}
+</style>
+</head>
+<body>
+
+<div class="appHeader">
+  <div><h2>Media Ingest</h2><div class="version" id="appVersion">V…</div></div>
+  <div class="statusPill" id="statusPill">
+    <span class="dot" id="statusDot"></span><span id="statusPillText">Checking tools…</span>
+  </div>
+</div>
+
+<div class="box toolsPopover" id="toolsPopover">
+  <div class="toolrow"><span class="toolname">yt-dlp</span><span id="ytpath" class="toolpath small">Checking…</span></div>
+  <div class="toolrow"><span class="toolname">FFmpeg</span><span id="ffpath" class="toolpath small">Checking…</span></div>
+  <div class="toolrow"><span class="toolname" id="premiereVersion">Premiere detecting…</span><span id="seqResolution" class="toolpath small">Sequence: detecting…</span></div>
+  <div id="folder" class="small" style="margin-top:6px;word-break:break-all">Folder: detecting…</div>
+  <div class="row" style="margin-top:8px">
+    <button id="openFolder" class="secondary">Open Videos Folder</button>
+    <button id="rescan" class="secondary">Rescan Tools</button>
+  </div>
+</div>
+
+<div class="segCtl">
+  <div class="segBtn active" id="modeImportBtn">Import</div>
+  <div class="segBtn" id="modeFindBtn">Find It</div>
+  <div class="segBtn" id="modeHistoryBtn">History</div>
+</div>
+
+<div id="importModeSection">
+  <div class="subTabRow">
+    <div class="subTab active" id="tabSingle">Single Clip</div>
+    <div class="subTab" id="tabBatch">Batch / Multi-Clip</div>
+  </div>
+
+  <div id="singleSection">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div style="display:flex;align-items:center;gap:6px"><label style="margin:0">Video URL</label><button id="pasteStart" class="secondary" style="padding:4px 8px;font-size:11px">Paste &amp; Start</button></div>
+      <button id="fetchInfo" class="secondary" style="padding:4px 8px;font-size:11px">Fetch Info</button>
+    </div>
+    <input id="url" type="text" placeholder="Paste URL (or: URL 02:34-03:15)" style="margin-top:4px">
+    <div id="urlBadge" class="small good" style="margin-top:4px;display:none"></div>
+    <div class="hint">Paste a URL with an optional range, then press Enter. Example: https://youtu.be/xyz 02:34-03:15</div>
+
+    <div id="previewCard" class="box previewCard" style="display:none;margin-top:8px;padding:8px">
+      <div class="previewTop">
+        <img id="previewThumb" class="previewThumb" style="width:100px;height:56px;object-fit:cover;border-radius:4px;background:#111">
+        <div class="previewInfo">
+          <div id="previewPlatform" class="previewPlatform" style="display:none"></div>
+          <div id="previewTitle" class="previewTitle"></div>
+          <div id="previewMeta" class="previewMeta"></div>
+        </div>
+      </div>
+      <div id="previewBadges" class="previewBadges" style="display:none"></div>
+    </div>
+
+    <div class="row" style="margin-top:8px">
+      <div><label>From</label><input id="start" value="00:00:00"></div>
+      <div><label>To</label><input id="end" value="00:00:15"></div>
+    </div>
+    <div id="rangeDuration" class="small good" style="margin-top:4px">Clip Duration: 15.00s</div>
+    <label class="check"><input id="useTimeRange" type="checkbox" checked> Use time range</label>
+    <label style="margin-top:8px">Import Mode</label>
+    <select id="importMode"><option value="projectAndTimeline">Project + Timeline</option><option value="projectOnly">Project Panel Only</option></select>
+  </div>
+
+  <div id="batchSection" style="display:none">
+    <label>Batch Downloads</label>
+    <textarea id="batchText" rows="6" placeholder="Paste one URL per line:&#10;https://youtube.com/video1&#10;https://youtube.com/video2&#10;https://instagram.com/...&#10;https://facebook.com/...&#10;&#10;Optional: URL 00:10 00:30"></textarea>
+    <div class="hint">Batch mode downloads each unique source video only ONCE and imports the downloaded videos into the Premiere Project panel. Nothing is inserted into the timeline.</div>
+  </div>
+
+  <div id="controlsPanel">
+    <div class="box">
+      <div class="foldRow open" id="foldQuality">
+        <span class="lbl">Quality</span><span class="chev">›</span>
+      </div>
+      <div class="foldBody open" id="foldQualityBody">
+        <select id="quality">
+          <option value="best" selected>Best Available</option>
+          <option value="2160">2160p (4K)</option>
+          <option value="1440">1440p</option>
+          <option value="1080">1080p</option>
+          <option value="720">720p</option>
+          <option value="480">480p</option>
+        </select>
+        <label style="margin-top:8px">Codec preference</label>
+        <select id="preferPreset">
+          <option value="h264">Prefer H.264 (most compatible)</option>
+          <option value="small">Prefer smaller file size</option>
+          <option value="balanced">Balanced</option>
+        </select>
+        <div class="hint">Selects up to the chosen resolution. If unavailable, the closest available stream is used.</div>
+      </div>
+    </div>
+
+    <div class="box">
+      <div class="foldRow" id="foldInsert">
+        <span class="lbl">Insert options</span><span class="chev">›</span>
+      </div>
+      <div class="foldBody" id="foldInsertBody">
+        <div class="row">
+          <div>
+            <label>Stream Mode</label>
+            <select id="streamMode">
+              <option value="both" selected>Video + Audio</option>
+              <option value="videoOnly">Video Only</option>
+              <option value="audioOnly">Audio Only (Fast)</option>
+            </select>
+          </div>
+          <div>
+            <label>Insertion Mode</label>
+            <select id="insertMode">
+              <option value="stack" selected>Stack at Playhead (Safe)</option>
+              <option value="ripple">Ripple Insert at Playhead</option>
+              <option value="overwrite">Overwrite at Playhead</option>
+              <option value="gap">Find Next Empty Gap</option>
+            </select>
+          </div>
+        </div>
+        <div id="modeHint" class="hint"></div>
+
+        <div class="toggleRow">
+          <span>Manual track control</span>
+          <div class="swtch" id="manualTrackSwitch"><div class="knob"></div></div>
+        </div>
+        <div class="trackFields" id="trackFields">
+          <div class="row">
+            <div>
+              <label>Video Track</label>
+              <select id="vtrack">
+                <option value="auto">Auto</option>
+                <option value="0">V1</option>
+                <option value="1">V2</option>
+                <option value="2">V3</option>
+              </select>
+            </div>
+            <div>
+              <label>Audio Track</label>
+              <select id="atrack">
+                <option value="auto">Auto</option>
+                <option value="0">A1</option>
+                <option value="1">A2</option>
+                <option value="2">A3</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="box">
+      <div class="foldRow" id="foldAdvanced">
+        <span class="lbl">Advanced</span><span class="chev">›</span>
+      </div>
+      <div class="foldBody" id="foldAdvancedBody">
+        <label class="check"><input id="scaleToFrame" type="checkbox" checked> Scale clip to sequence frame size</label>
+        <label class="check"><input id="snapToMarker" type="checkbox"> Snap start position to nearest sequence marker</label>
+        <label class="check"><input id="reuseExisting" type="checkbox" checked> Reuse existing download when available</label>
+      </div>
+    </div>
+  </div>
+
+  <div class="box">
+    <div class="row">
+      <button id="add">Download &amp; Add Selection(s)</button>
+      <button id="test" class="secondary">Test Tools</button>
+    </div>
+    <div class="progress"><div id="progressBar"></div></div>
+    <div id="progressDetail" class="small" style="margin-top:4px"></div>
+    <div class="row" style="margin-top:8px"><button id="cancel" class="secondary" style="display:none">Cancel</button></div>
+    <div id="status" class="status" style="margin-top:8px">Ready.</div>
+    <div id="resultCard" class="box" style="display:none;margin-top:8px;padding:9px;background:#171717">
+      <div style="font-size:11px;font-weight:700;color:#bbb;margin-bottom:6px">Last Result</div>
+      <div id="resultTitle" style="font-weight:700;color:#fff;margin-bottom:4px"></div>
+      <div id="resultMeta" class="small" style="line-height:1.45"></div>
+      <div id="resultPath" class="small" style="margin-top:5px;word-break:break-all"></div>
+    </div>
+
+    <div id="reuseChoice" class="reuseChoice" style="display:none">
+      <div id="reuseChoiceText" class="small" style="margin-bottom:8px"></div>
+      <div class="row">
+        <button id="reuseUseExisting">Use Existing</button>
+        <button id="reuseDownloadAgain" class="secondary">Download Again</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="findModeSection" style="display:none">
+  <div class="box">
+    <div class="foldRow" id="foldGoogleApi">
+      <span class="lbl">Google API setup</span><span class="chev">›</span>
+    </div>
+    <div class="foldBody" id="foldGoogleApiBody">
+      <label>YouTube Data API v3 key</label>
+      <input id="youtubeApiKey" type="password" autocomplete="off" placeholder="AIza… (for search and duration validation)">
+      <label>Gemini API key</label>
+      <input id="geminiApiKey" type="password" autocomplete="off" placeholder="AIza… (for video understanding)">
+      <label>Gemini model</label>
+      <input id="geminiModel" type="text" value="gemini-3.8-flash" placeholder="gemini-3.8-flash">
+      <div class="hint">Keys stay in this panel's local settings on this computer. Restrict the YouTube key to YouTube Data API v3. The current default model can be changed here without updating the extension.</div>
+      <div class="row" style="margin-top:8px"><button id="saveGoogleApi" class="secondary">Save API Settings</button><button id="clearGoogleApi" class="secondary">Clear Keys</button></div>
+    </div>
+    <div id="googleApiState" class="small warn" style="margin-top:7px">Add both API keys to use Find It.</div>
+  </div>
+
+  <div class="box">
+    <div class="findStep">1. Choose a video</div>
+    <div class="subTabRow"><div class="subTab active" id="findSearchTab">Search YouTube</div><div class="subTab" id="findUrlTab">I have a URL</div></div>
+    <div id="findSearchPanel">
+      <label>Describe the video or event</label>
+      <input id="findSearchQuery" type="text" placeholder="e.g. a news event where…">
+      <button id="findSearchBtn" style="margin-top:8px">Search YouTube</button>
+      <div class="hint">Search returns candidates only. You must choose the correct video before any analysis runs.</div>
+      <div id="findCandidates"></div>
+    </div>
+    <div id="findUrlPanel" style="display:none">
+      <label>Public YouTube URL</label>
+      <input id="findKnownUrl" type="text" placeholder="https://www.youtube.com/watch?v=…">
+      <button id="confirmKnownUrl" style="margin-top:8px">Use This Video</button>
+      <div class="hint">Use this for the most reliable flow when you already know the source video.</div>
+    </div>
+    <div id="findSelectedVideo" class="findNotice" style="display:none"></div>
+  </div>
+
+  <div class="box">
+    <div class="findStep">2. Find the moment</div>
+    <label>What happens in this video?</label>
+    <textarea id="findMomentQuery" rows="3" placeholder="e.g. where he opens the lid and checks the trackpad"></textarea>
+    <button id="analyzeMomentBtn" style="margin-top:8px">Analyze Video with Gemini</button>
+    <div class="hint">Gemini is given the selected public YouTube video as structured video input, not as text. A returned range is checked against YouTube's reported duration.</div>
+    <div id="findAnalysis" style="display:none"></div>
+  </div>
+
+  <div class="box" id="findCommitBox" style="display:none">
+    <div class="findStep">3. Confirm and import</div>
+    <div id="findCommitSummary" class="small"></div>
+    <button id="useFoundClipBtn" style="margin-top:8px">Use This Range in Import</button>
+    <div class="hint">This only fills the existing Import controls. You review the range once more and start the normal download/import pipeline yourself.</div>
+  </div>
+</div>
+
+<div id="historySection" style="display:none">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:6px">
+    <div id="storageSummary" class="small good" style="flex:1">Media Storage: calculating…</div>
+    <button id="cleanMissingBtn" class="secondary" style="padding:4px 8px;font-size:11px">Clean Missing</button>
+    <button id="refreshHistoryBtn" class="secondary" style="padding:4px 8px;font-size:11px">Refresh</button>
+  </div>
+  <input id="historySearch" type="text" placeholder="Search downloaded media…" style="margin-bottom:8px">
+  <div class="row" style="gap:4px;margin-bottom:8px">
+    <select id="historyPlatform"><option value="all">All platforms</option><option value="YouTube">YouTube</option><option value="Instagram">Instagram</option><option value="Facebook">Facebook</option></select>
+    <select id="historyQuality"><option value="all">All qualities</option><option value="4k+">4K+</option><option value="1440p">1440p</option><option value="1080p">1080p</option><option value="720p">720p</option><option value="480p-or-lower">480p or lower</option></select>
+    <select id="historyCodec"><option value="all">All video codecs</option><option value="h264">H.264</option><option value="av1">AV1</option><option value="vp9">VP9</option><option value="vp8">VP8</option></select>
+  </div>
+  <div class="row" style="gap:4px;margin-bottom:8px">
+    <button id="historyRecent" class="secondary" style="padding:6px 9px;font-size:11px">Recently Used</button>
+    <button id="historyMostUsed" class="secondary" style="padding:6px 9px;font-size:11px">Most Used</button>
+  </div>
+  <div class="row" style="gap:4px;margin-bottom:8px">
+    <select id="historySort" style="flex:1"><option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="name">Name A–Z</option><option value="size">Largest first</option></select>
+    <button id="historyFavoritesOnly" class="secondary" style="padding:6px 9px;font-size:11px">★ Favorites</button>
+    <button id="historyClearSearch" class="secondary" style="padding:6px 9px;font-size:11px">Clear</button>
+  </div>
+  <div id="historyList" style="max-height:320px;overflow-y:auto"></div>
+</div>
+
+<script src="./app.js"></script>
+</body>
+</html>
